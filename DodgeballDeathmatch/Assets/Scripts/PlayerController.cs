@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public string animWord;
 
 
+
     public Player Player;
     public Movement Movement;
     public float _movementSpeed;
@@ -21,6 +22,7 @@ public class PlayerController : MonoBehaviour
     public int health = 100;
     public int team = 1;
     public int bite ;
+
 
     private GameObject _dodgeball;
     private Animator myAnimator;
@@ -168,10 +170,27 @@ public class PlayerController : MonoBehaviour
 
             if (_ballController.LiveStatus)
             {
+                dodgeball.GetComponent<BallController>().PickupStatus = false;
+
+                Player.RemoveFromReachable(dodgeball);
+            }
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.GetComponent<Collider2D>() is CircleCollider2D)
+        {
+            var dodgeball = collision.gameObject;
+
+            var _ballController = dodgeball.GetComponent<BallController>();
+
+            if(_ballController.IsLive)
+            {
                 Player.TakeDamage(_ballController.Damage);
 
                 _ballController.PickupStatus = false;
-                _ballController.LiveStatus = false;
+                _ballController.IsLive = false;
 
                 StartCoroutine("ResetPhysics");
             }
@@ -180,6 +199,7 @@ public class PlayerController : MonoBehaviour
 
     void Throw()
     {
+        if (isPaused) return;
         _dodgeball = Instantiate(dodgeballPrefab) as GameObject;
 
         var direction = 1;
@@ -195,7 +215,6 @@ public class PlayerController : MonoBehaviour
     IEnumerator ResetPhysics()
     {
         yield return new WaitForSeconds(2f);
-
         Rigidbody2D _rbody = this.gameObject.GetComponent<Rigidbody2D>();
 
         this.transform.localRotation = Quaternion.identity;
