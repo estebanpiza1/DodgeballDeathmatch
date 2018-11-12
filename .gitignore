@@ -38,3 +38,9 @@ sysinfo.txt
 
 # Apple Files
 *.DS_Store
+
+# Ignore changes to Unity version used
+*ProjectVersion.txt
+
+# Log Files
+*.log
